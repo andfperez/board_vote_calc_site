@@ -1,12 +1,16 @@
 const voteTable = document.querySelector("#vote-table");
 const resetButton = document.querySelector("#reset-button");
+const captureButton = document.querySelector("#capture-button");
+const appShell = document.querySelector(".app-shell");
+const investmentNameInput = document.querySelector("#investment-name");
 
 const supportTotal = document.querySelector("#support-total");
-const commentTotal = document.querySelector("#comment-total");
+const approvalTotal = document.querySelector("#approval-total");
 const abstainTotal = document.querySelector("#abstain-total");
 const objectTotal = document.querySelector("#object-total");
 
 const STORAGE_KEY = "board-vote-calculator-state";
+const INVESTMENT_NAME_KEY = "board-vote-calculator-investment-name";
 
 const positions = {
   support: {
@@ -37,8 +41,46 @@ function loadState() {
   }
 
   try {
-    return JSON.parse(savedState);
-  } catch {
+    const parsedState = JSON.parse(savedState);
+
+    if (
+      !parsedState ||
+      typeof parsedState !== "object" ||
+      Array.isArray(parsedState)
+    ) {
+      localStorage.removeItem(STORAGE_KEY);
+      return {};
+    }
+
+    const validConstituencyIds = new Set(
+      constituencies.map((constituency) => constituency.id)
+    );
+
+    const validPositions = new Set([
+      "support",
+      "comment",
+      "abstain",
+      "object",
+    ]);
+
+    const cleanedState = {};
+
+    Object.entries(parsedState).forEach(([constituencyId, position]) => {
+      if (
+        validConstituencyIds.has(constituencyId) &&
+        validPositions.has(position) &&
+        position !== "support"
+      ) {
+        cleanedState[constituencyId] = position;
+      }
+    });
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cleanedState));
+
+    return cleanedState;
+  } catch (error) {
+    console.warn("Saved voting scenario could not be loaded.", error);
+    localStorage.removeItem(STORAGE_KEY);
     return {};
   }
 }
@@ -59,6 +101,24 @@ function setPosition(constituencyId, position) {
   }
 
   saveState();
+function loadInvestmentName() {
+  const savedName = localStorage.getItem(INVESTMENT_NAME_KEY);
+
+  if (savedName) {
+    investmentNameInput.value = savedName;
+  }
+}
+
+function saveInvestmentName() {
+  const investmentName = investmentNameInput.value.trim();
+
+  if (investmentName) {
+    localStorage.setItem(INVESTMENT_NAME_KEY, investmentName);
+  } else {
+    localStorage.removeItem(INVESTMENT_NAME_KEY);
+  }
+}
+
   render();
 }
 
@@ -145,11 +205,16 @@ function createVoteRow(constituency) {
 function renderSummary() {
   const totals = calculateTotals();
 
-  supportTotal.textContent = formatPercentage(
-    totals.support + totals.comment
-  );
+  const supportVotingPower = totals.support + totals.comment;
+  const votesCast = supportVotingPower + totals.object;
 
-  commentTotal.textContent = formatPercentage(totals.comment);
+  const approvalPercentage =
+    votesCast > 0
+      ? (supportVotingPower / votesCast) * 100
+      : 0;
+
+  supportTotal.textContent = formatPercentage(supportVotingPower);
+  approvalTotal.textContent = formatPercentage(approvalPercentage);
   abstainTotal.textContent = formatPercentage(totals.abstain);
   objectTotal.textContent = formatPercentage(totals.object);
 }
@@ -167,10 +232,79 @@ function render() {
   renderTable();
 }
 
+function render() {
+  renderSummary();
+  renderTable();
+}
+
+function createSnapshotFilename() {
+  const investmentName = investmentNameInput?.value.trim();
+  const baseName = investmentName || "voting-scenario";
+
+  const safeName = baseName
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  const date = new Date().toISOString().slice(0, 10);
+
+  return `${safeName || "voting-scenario"}-${date}.png`;
+}
+
+async function captureScenario() {
+  if (!window.html2canvas || !appShell) {
+    window.alert("The snapshot function could not be loaded.");
+    return;
+  }
+
+  const originalButtonText = captureButton.textContent;
+
+  try {
+    captureButton.disabled = true;
+    captureButton.textContent = "Creating…";
+    document.body.classList.add("is-capturing");
+
+    await new Promise((resolve) => {
+      window.requestAnimationFrame(resolve);
+    });
+
+    const canvas = await window.html2canvas(appShell, {
+      backgroundColor: "#eef3f8",
+      scale: 2,
+      useCORS: true,
+      logging: false,
+    });
+
+    const downloadLink = document.createElement("a");
+
+    downloadLink.download = createSnapshotFilename();
+    downloadLink.href = canvas.toDataURL("image/png");
+    downloadLink.click();
+  } catch (error) {
+    console.error("The snapshot could not be created.", error);
+    window.alert("The snapshot could not be created.");
+  } finally {
+    document.body.classList.remove("is-capturing");
+    captureButton.disabled = false;
+    captureButton.textContent = originalButtonText;
+  }
+}
+
+captureButton.addEventListener("click", captureScenario);
+
 resetButton.addEventListener("click", () => {
   voteState = {};
   localStorage.removeItem(STORAGE_KEY);
   render();
 });
 
+// Render the voting table immediately when the page loads.
 render();
+
+// Load and activate the investment-name field separately.
+if (investmentNameInput) {
+  loadInvestmentName();
+  investmentNameInput.addEventListener("input", saveInvestmentName);
+} else {
+  console.warn("Investment name input was not found.");
+}

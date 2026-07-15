@@ -12,44 +12,77 @@
   <body>
     <main class="app-shell">
         <section class="app-header">
-            <div>
-                <p class="eyebrow">IFC Board Proposal</p>
-                <h1>Board Position Scenario Builder</h1>
+
+            <div class="header-content">
+                <p class="eyebrow">Board Positions Scenario Builder</p>
+                <h1>Distribution of Board Support and Voting</h1>
+
+                <label class="investment-field">
+                    <span class="investment-label">Proposed investment</span>
+
+                    <input
+                    id="investment-name"
+                    type="text"
+                    placeholder="Enter investment name"
+                    autocomplete="off"
+                    />
+                </label>
 
                 <p class="data-date">
                     Voting power:
-                    <strong>as of June 30, 2026</strong>
-                    •
-                    Reported July 9, 2026
+                    As of June 30, 2026
+                    |
+                    Reported by SECCA on July 9, 2026
                 </p>
             </div>
 
-            <button id="reset-button" class="secondary-button" type="button">
-                Reset
-            </button>
+            <div class="header-actions">
+                <button id="capture-button" class="primary-button" type="button">
+                    Snapshot
+                </button>
+
+                <button id="reset-button" class="secondary-button" type="button">
+                    Reset
+                </button>
+            </div>
         </section>
 
-      <section class="summary-grid" aria-label="Voting totals">
+        <section class="summary-grid" aria-label="Voting totals">
+        
+            <article class="summary-card">
+                <span class="summary-label">Support</span>
+                <span class="summary-subtitle">of total voting power</span>
+                <strong id="support-total">100.00%</strong>
+            </article>
+
+            <article class="summary-card summary-card-emphasis">
+                <span class="summary-label">
+                    Final Tally<sup>1</sup>
+                </span>
+
+                <span class="summary-subtitle">net of abstentions</span>
+
+                <strong id="approval-total">100.00%</strong>
+            </article>
+
         <article class="summary-card">
-          <span class="summary-label">Support</span>
-          <strong id="support-total">100.00%</strong>
+            <span class="summary-label">Abstain</span>
+             <span class="summary-subtitle" aria-hidden="true">&nbsp;</span>
+            <strong id="abstain-total">0.00%</strong>
         </article>
 
         <article class="summary-card">
-          <span class="summary-label">Comments</span>
-          <strong id="comment-total">0.00%</strong>
+            <span class="summary-label">Object</span>
+             <span class="summary-subtitle" aria-hidden="true">&nbsp;</span>
+            <strong id="object-total">0.00%</strong>
         </article>
+        </section>
 
-        <article class="summary-card">
-          <span class="summary-label">Abstain</span>
-          <strong id="abstain-total">0.00%</strong>
-        </article>
-
-        <article class="summary-card">
-          <span class="summary-label">Object</span>
-          <strong id="object-total">0.00%</strong>
-        </article>
-      </section>
+       <p class="voting-note">
+            <sup>1</sup> Under the applicable voting rules, abstentions are not counted
+            toward the final tally. Accordingly, the abstaining voting power is excluded
+            from the calculation.
+       </p>
 
       <section class="table-panel">
         <div class="table-header">
@@ -63,6 +96,7 @@
     </main>
 
     <script src="data.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
