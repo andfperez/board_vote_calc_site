@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Board Vote Calculator</title>
+
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <main class="app-shell">
+        <section class="app-header">
+            <div>
+                <p class="eyebrow">IFC Board Proposal</p>
+                <h1>Board Position Scenario Builder</h1>
+
+                <p class="data-date">
+                    Voting power:
+                    <strong>as of June 30, 2026</strong>
+                    •
+                    Reported July 9, 2026
+                </p>
+            </div>
+
+            <button id="reset-button" class="secondary-button" type="button">
+                Reset
+            </button>
+        </section>
+
+      <section class="summary-grid" aria-label="Voting totals">
+        <article class="summary-card">
+          <span class="summary-label">Support</span>
+          <strong id="support-total">100.00%</strong>
+        </article>
+
+        <article class="summary-card">
+          <span class="summary-label">Comments</span>
+          <strong id="comment-total">0.00%</strong>
+        </article>
+
+        <article class="summary-card">
+          <span class="summary-label">Abstain</span>
+          <strong id="abstain-total">0.00%</strong>
+        </article>
+
+        <article class="summary-card">
+          <span class="summary-label">Object</span>
+          <strong id="object-total">0.00%</strong>
+        </article>
+      </section>
+
+      <section class="table-panel">
+        <div class="table-header">
+          <span>Constituency</span>
+          <span>Voting power</span>
+          <span>Position</span>
+        </div>
+
+        <div id="vote-table" class="vote-table"></div>
+      </section>
+    </main>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
