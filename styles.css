@@ -279,7 +279,7 @@ h1 {
 }
 
 .vote-row {
-  min-height: 62px;
+  min-height: 50px;
   padding: 0 18px;
   border-bottom: 1px solid #e4eaf0;
   transition: background 150ms ease;
@@ -330,7 +330,7 @@ h1 {
 
 .position-select {
   width: 148px;
-  min-height: 40px;
+  min-height: 34px;
   padding: 0 38px 0 14px;
   border: 0;
   border-radius: 11px;
